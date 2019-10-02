@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 	"strconv"
+	"time"
 )
 
 type CoreGateway struct {
@@ -22,14 +22,8 @@ func (gateway *CoreGateway) PushToPay(req *PushToPayRequest, lang string) (PushT
 
 	err := gateway.Client.Call("POST", path, headers, bytes.NewBuffer(jsonReq), &resp)
 	if err != nil {
-		fmt.Println("Error Push To Pay : ", err)
-
-		message := "Transaksi Gagal"
-		if lang == "en" {
-			message = "Transaction Failed"
-		}
-
-		return resp, errors.New(message)
+		fmt.Println("Error Checkout : ", err)
+		return resp, err
 	}
 
 	if resp.ResponseCode != "00" {
@@ -105,10 +99,10 @@ func (gateway *CoreGateway) CheckPaymentStatus(req *PushToPayRequest, lang strin
 
 func (gateway *CoreGateway) PopulateHeader() []Header {
 	head := []Header{
-        Header{Key: "app-id", Value: gateway.Client.AppID},
-        Header{Key: "random", Value: strconv.FormatInt(time.Now().Unix(), 10)},
-        Header{Key: "hmac", Value: EncodeHMACSHA256(gateway.Client.AppID, strconv.FormatInt(time.Now().Unix(), 10), gateway.Client.Key)},
-    }
+		Header{Key: "app-id", Value: gateway.Client.AppID},
+		Header{Key: "random", Value: strconv.FormatInt(time.Now().Unix(), 10)},
+		Header{Key: "hmac", Value: EncodeHMACSHA256(gateway.Client.AppID, strconv.FormatInt(time.Now().Unix(), 10), gateway.Client.Key)},
+	}
 
 	return head
 }
